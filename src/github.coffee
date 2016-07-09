@@ -129,30 +129,3 @@ graphsFromPR = (config, repo, number) ->
 
 module.exports.graphsFromPR = graphsFromPR
 
-collectStream = (stream) ->
-  return new Promise (fufill, reject) ->
-    body = ""
-    stream.on 'data', (data) ->
-      body += data.toString()
-    stream.on 'end', () ->
-      return fufill body
-    stream.on 'error', reject
-
-main = () ->
-  [_node, _script, repo, pr] = process.argv
-
-  config =
-    endpoint: 'https://api.github.com'
-    token: process.env.GH_TOKEN
-  throw new Error 'Missing Github PR repo PR' if not (repo and pr)
-
-  collectStream process.stdin
-  .then (body) ->
-    return issuePostComment config, repo, pr, body
-  .then (r) ->
-    console.log "Posted comment to #{repo} #{pr}:", r.data.url
-  .catch (err) ->
-    console.error err
-
-main() if not module.parent
-

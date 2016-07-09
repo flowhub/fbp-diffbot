@@ -14,7 +14,6 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 ### v0.1 "minimally useful"
 
-* Posting the diff back to PR
 * Register webhooks for automatic update from Github
 * Find out how to invalidate outdated comments. Post onto the diff?
 * Find out how to avoid duplicate comments

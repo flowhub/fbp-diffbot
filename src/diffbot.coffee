@@ -7,6 +7,16 @@ generateDiffs = (graphs, options) ->
     options.format = type
     g.diff = fbpDiff.diff g.from, g.to, options
 
+formatComment = (graphs) ->
+  comment = ""
+
+  for graph in graphs
+    comment += "[fbp-diff](https://github.com/flowbased/fbp-diff) for `#{graph.filename}`:\n"
+    comment += "```\n#{graph.diff}\n```\n"
+    comment += "\n"
+
+  return comment
+
 main = () ->
   [_node, _script, repo, pr] = process.argv
 
@@ -22,9 +32,16 @@ main = () ->
   github.graphsFromPR config, repo, pr
   .then (graphs) ->
     generateDiffs graphs, diffOptions
-    for g in graphs
-      console.log g.filename
-      console.log g.diff, '\n'
+    if graphs
+      return formatComment graphs
+    else
+      return null
+  .then (maybeComment) ->
+    if maybeComment
+      console.log 'Posting:\n', maybeComment
+      return github.issuePostComment config, repo, pr, maybeComment
+    else
+      console.log "No changes"
   .catch (err) ->
     console.log 'e', err
     throw err

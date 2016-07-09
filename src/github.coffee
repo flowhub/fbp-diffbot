@@ -22,7 +22,7 @@ graphsFromPR = (config, repo, number) ->
   axios.get(url, request)
   .then (req) ->
     pr = req.data
-    console.log 'pr', pr
+    # console.log 'pr', pr
     ret =
       commitsUrl: pr.commits_url
       base:
@@ -36,26 +36,36 @@ graphsFromPR = (config, repo, number) ->
     axios.get(data.commitsUrl, request)
     .then (req) ->
       commits = req.data
-      console.log 'commits', commits
       data.commits = commits
       return data
   .then (data) ->
     bluebird.map data.commits, (commit) ->
       commit = commit.commit
-      console.log 'COMMIT', commit.tree
       return axios.get commit.tree.url, request
     .then (requests) ->
       trees = requests.map (r) -> r.data
-      console.log 'trees', trees.length
-      console.log trees[0]
-      filesChanged = []
-      # FIXME: need to traverse down into graphs/, either recursively or hardcode this dir...
-      for tree in trees
-        for file in tree.tree
-          if not (file.path in filesChanged)
-            filesChanged.push file.path
-      data.filesChanged = filesChanged
-      return data
+      graphDirTrees = trees.map (t) ->
+        graphDirUrl = null
+        for f in t.tree
+          if f.path == 'graphs'
+            graphDirUrl = f.url
+        return graphDirUrl
+      .filter (u) ->
+        return u?
+
+      bluebird.map graphDirTrees, (u) ->
+        return axios.get u
+      .then (requests) ->
+        graphTrees = requests.map (r) -> r.data
+
+        graphsChanged = []
+        for tree in graphTrees
+          for file in tree.tree
+            if not (file.path in graphsChanged)
+              graphsChanged.push file.path
+        data.graphsChanged = graphsChanged
+        data.commits = null
+        return data
 
 main = () ->
   [_node, _script, repo, pr] = process.argv

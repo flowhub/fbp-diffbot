@@ -46,6 +46,35 @@ getAuthenticated = (config, url) ->
   request.headers.Authorization = "token #{config.token}" if config.token
   axios.get(url, request)
 
+fileAtRevision = (config, repo, revision, filepath) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+
+  axios.get "#{config.endpoint}/repos/#{repo}/git/commits/#{revision}", request
+  .then (req) ->
+    commit = req.data
+    return commit.tree.url
+  .then (treeUrl) ->
+    r =
+      headers: request.headers
+      params:
+        recursive: 1
+    axios.get treeUrl, r
+  .then (req) ->
+    tree = req.data.tree
+    foundUrl = null
+    for file in tree
+      if file.path == filepath
+        foundUrl = file.url
+    throw new Error "File #{filepath} does not exist in #{revision} of #{repo}" if not foundUrl
+    return foundUrl
+  .then (u) ->
+    axios.get u, request
+    .then (res) ->
+      contents = new Buffer(res.data.content, 'base64').toString()
+      return contents
+
 graphsFromPR = (config, repo, number) ->
   prGet config, repo, number
   .then (pr) ->
@@ -71,10 +100,13 @@ graphsFromPR = (config, repo, number) ->
       .then (req) ->
         ret.to = req.data
       .then (_) ->
-        ret.from = null # FIXME: implement
-        return ret
+        fileAtRevision config, repo, data.base.sha, graph.filename
+        .then (contents) ->
+          ret.from = contents
+          return ret
       .catch (req) ->
         # FIXME: figure out why fails for private repos
+        console.log 'ERROR', req
         ret.error =
           code: req.status
           msg: req.statusText

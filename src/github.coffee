@@ -10,62 +10,27 @@ getFile = (config, repo, path) ->
   url = "#{config.endpoint}/repos/#{repo}/contents/#{path}"
   axios.get url, request
 
-# TODO: find out which files changed. Need to get the commits, then get each of the trees.
-# TODO: filter these to only include (probable) FBP graphs
-# TODO: get the graphs as blobs
+fileCouldBeGraph = (name) ->
+  ext = name.split('.').pop()
+  if ext == 'fbp'
+    return true
+  else if ext == 'json'
+    return name not in ['package.json', 'component.json'] 
+  else
+    return false
+
+# TODO: get the graphs as blobs, before and after change
 graphsFromPR = (config, repo, number) ->
   request =
     headers: {}
   request.headers.Authorization = "token #{config.token}" if config.token
 
-  url = "#{config.endpoint}/repos/#{repo}/pulls/#{number}"
+  url = "#{config.endpoint}/repos/#{repo}/pulls/#{number}/files"
   axios.get(url, request)
   .then (req) ->
-    pr = req.data
-    # console.log 'pr', pr
-    ret =
-      commitsUrl: pr.commits_url
-      base:
-        sha: pr.base.sha
-        repo: pr.base.repo.full_name
-      head:
-        sha: pr.head.sha
-        repo: pr.head.repo.full_name
-  .then (data) ->
-    console.log data
-    axios.get(data.commitsUrl, request)
-    .then (req) ->
-      commits = req.data
-      data.commits = commits
-      return data
-  .then (data) ->
-    bluebird.map data.commits, (commit) ->
-      commit = commit.commit
-      return axios.get commit.tree.url, request
-    .then (requests) ->
-      trees = requests.map (r) -> r.data
-      graphDirTrees = trees.map (t) ->
-        graphDirUrl = null
-        for f in t.tree
-          if f.path == 'graphs'
-            graphDirUrl = f.url
-        return graphDirUrl
-      .filter (u) ->
-        return u?
-
-      bluebird.map graphDirTrees, (u) ->
-        return axios.get u
-      .then (requests) ->
-        graphTrees = requests.map (r) -> r.data
-
-        graphsChanged = []
-        for tree in graphTrees
-          for file in tree.tree
-            if not (file.path in graphsChanged)
-              graphsChanged.push file.path
-        data.graphsChanged = graphsChanged
-        data.commits = null
-        return data
+    files = req.data
+    graphs = files.filter (f) -> return fileCouldBeGraph f.filename
+    return graphs
 
 main = () ->
   [_node, _script, repo, pr] = process.argv

@@ -65,19 +65,21 @@ graphsFromPR = (config, repo, number) ->
       return data
   .then (data) ->
     bluebird.map data.graphsChanged, (graph) ->
+      ret =
+        filename: graph.filename
       getAuthenticated config, graph.raw_url
       .then (req) ->
-        ret =
-          filename: graph.filename
-          from: null # FIXME: implement
-          to: req.data
+        ret.to = req.data
+      .then (_) ->
+        ret.from = null # FIXME: implement
+        return ret
       .catch (req) ->
         # FIXME: figure out why fails for private repos
-        ret =
-          filename: graph.filename
-          error:
-            code: req.status
-            meg: req.statusText
+        ret.error =
+          code: req.status
+          msg: req.statusText
+        return ret
+
     .then (graphs) ->
       data.graphs = graphs
       return data

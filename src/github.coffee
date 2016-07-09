@@ -20,7 +20,7 @@ fileCouldBeGraph = (name) ->
     return false
 
 # TODO: get the graphs as blobs, before and after change
-graphsFromPR = (config, repo, number) ->
+prGraphsChanged = (config, repo, number) ->
   request =
     headers: {}
   request.headers.Authorization = "token #{config.token}" if config.token
@@ -31,6 +31,57 @@ graphsFromPR = (config, repo, number) ->
     files = req.data
     graphs = files.filter (f) -> return fileCouldBeGraph f.filename
     return graphs
+
+prGet = (config, repo, number) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+  url = "#{config.endpoint}/repos/#{repo}/pulls/#{number}"
+  axios.get(url, request).then (request) ->
+    return request.data
+
+getAuthenticated = (config, url) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+  axios.get(url, request)
+
+graphsFromPR = (config, repo, number) ->
+  prGet config, repo, number
+  .then (pr) ->
+    ret =
+      base:
+        sha: pr.base.sha
+        repo: pr.base.repo.full_name
+      head:
+        sha: pr.head.sha
+        repo: pr.head.repo.full_name
+  .then (data) ->
+    prGraphsChanged config, repo, number
+    .then (graphs) ->
+      data.graphsChanged = graphs.map (g) ->
+        g.patch = 'hidden'
+        return g
+      return data
+  .then (data) ->
+    bluebird.map data.graphsChanged, (graph) ->
+      getAuthenticated config, graph.raw_url
+      .then (req) ->
+        ret =
+          filename: graph.filename
+          from: null # FIXME: implement
+          to: req.data
+      .catch (req) ->
+        # FIXME: figure out why fails for private repos
+        ret =
+          filename: graph.filename
+          error:
+            code: req.status
+            meg: req.statusText
+    .then (graphs) ->
+      data.graphs = graphs
+      return data
+
 
 main = () ->
   [_node, _script, repo, pr] = process.argv

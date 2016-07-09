@@ -96,16 +96,15 @@ graphsFromPR = (config, repo, number) ->
     bluebird.map data.graphsChanged, (graph) ->
       ret =
         filename: graph.filename
-      getAuthenticated config, graph.raw_url
-      .then (req) ->
-        ret.to = req.data
+      fileAtRevision config, data.head.repo, data.head.sha, graph.filename
+      .then (contents) ->
+        ret.to = contents
       .then (_) ->
         fileAtRevision config, repo, data.base.sha, graph.filename
         .then (contents) ->
           ret.from = contents
           return ret
       .catch (req) ->
-        # FIXME: figure out why fails for private repos
         console.log 'ERROR', req
         ret.error =
           code: req.status
@@ -114,8 +113,7 @@ graphsFromPR = (config, repo, number) ->
 
     .then (graphs) ->
       data.graphs = graphs
-      return data
-
+      return data.graphs
 
 main = () ->
   [_node, _script, repo, pr] = process.argv
@@ -130,7 +128,8 @@ main = () ->
   console.log repo, pr
   graphsFromPR config, repo, pr
   .then (graphs) ->
-    console.log 'sss', graphs
+    for g in graphs
+      console.log 'g', g.filename, g.from.length, g.to.length, g.error
   .catch (err) ->
     console.log 'e', err
     throw err

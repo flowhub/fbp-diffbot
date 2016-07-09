@@ -75,6 +75,18 @@ fileAtRevision = (config, repo, revision, filepath) ->
       contents = new Buffer(res.data.content, 'base64').toString()
       return contents
 
+# NOTE: PRs are issues
+issuePostComment = (config, repo, issue, body) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+  url = "#{config.endpoint}/repos/#{repo}/issues/#{issue}/comments"
+  comment =
+    body: body
+  return axios.post url, comment, request
+
+module.exports.issuePostComment = issuePostComment
+
 graphsFromPR = (config, repo, number) ->
   prGet config, repo, number
   .then (pr) ->
@@ -116,3 +128,31 @@ graphsFromPR = (config, repo, number) ->
       return data.graphs
 
 module.exports.graphsFromPR = graphsFromPR
+
+collectStream = (stream) ->
+  return new Promise (fufill, reject) ->
+    body = ""
+    stream.on 'data', (data) ->
+      body += data.toString()
+    stream.on 'end', () ->
+      return fufill body
+    stream.on 'error', reject
+
+main = () ->
+  [_node, _script, repo, pr] = process.argv
+
+  config =
+    endpoint: 'https://api.github.com'
+    token: process.env.GH_TOKEN
+  throw new Error 'Missing Github PR repo PR' if not (repo and pr)
+
+  collectStream process.stdin
+  .then (body) ->
+    return issuePostComment config, repo, pr, body
+  .then (r) ->
+    console.log "Posted comment to #{repo} #{pr}:", r.data.url
+  .catch (err) ->
+    console.error err
+
+main() if not module.parent
+

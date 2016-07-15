@@ -174,6 +174,15 @@ repoAddHook = (config, repo, data) ->
 
 exports.repoAddHook = repoAddHook
 
+repoListHooks = (config, repo, data) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+  url = "#{config.endpoint}/repos/#{repo}/hooks"
+  return axios.get url, request
+
+exports.repoListHooks = repoListHooks
+
 main = () ->
   config = common.getConfig()
   d =

@@ -49,6 +49,8 @@ parseComment = (comment) ->
   return ret
 
 sameSHA = (a, b) ->
+  return false if not a
+  return false if not b
   same = if a.length > b.length
     a.indexOf(b) == 0
   else

@@ -99,7 +99,17 @@ issuePostComment = (config, repo, issue, body) ->
 
 module.exports.issuePostComment = issuePostComment
 
-graphsFromPR = (config, repo, number) ->
+issueListComments = (config, repo, issue) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+  url = "#{config.endpoint}/repos/#{repo}/issues/#{issue}/comments"
+
+  return axios.get url, request
+
+exports.issueListComments = issueListComments
+
+prGetChanges = (config, repo, number) ->
   prGet config, repo, number
   .then (pr) ->
     ret =
@@ -109,6 +119,13 @@ graphsFromPR = (config, repo, number) ->
       head:
         sha: pr.head.sha
         repo: pr.head.repo.full_name
+    return ret
+
+exports.prGetChanges = prGetChanges
+
+graphsFromPR = (config, repo, number) ->
+  
+  prGetChanges config, repo, number
   .then (data) ->
     prGraphsChanged config, repo, number
     .then (graphs) ->

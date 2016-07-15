@@ -8,13 +8,12 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 **Proof of concept**
 
-* A command-line tool can get changed graphs from a Github PR and calculate their diffs
+* `fbp-diffbot-checkpr` can check Github PR, calculate diffs and post it as a comment
 
 ## TODO
 
 ### v0.1 "minimally useful"
 
-* Avoid duplicate comments
 * Add HTTP API for manually triggering PR check
 * Register webhooks for automatic update from Github
 * Deploy it to production

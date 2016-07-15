@@ -1,5 +1,6 @@
 github = require './github'
 fbpDiff = require 'fbp-diff'
+debug = require('debug')('fbp-diffbot:diffbot')
 
 # TODO: move added/removed handling into fbp-diff itself?
 nullGraph =
@@ -34,6 +35,39 @@ formatComment = (pr) ->
 
   return comment
 
+parseComment = (comment) ->
+  ret =
+    fromCommit: null
+    toCommit: null
+  re = /[fbp\-diff].*`(\w*)...(\w*)`/
+  match = re.exec comment
+  ret.fromCommit = match[1]
+  ret.toCommit = match[2]
+  return ret
+
+sameSHA = (a, b) ->
+  same = if a.length > b.length
+    a.indexOf(b) == 0
+  else
+    b.indexOf(a) == 0
+  return same
+
+hasNewChanges = (config, repo, pr) ->
+  github.issueListComments config, repo, pr
+  .then (res) ->
+    parsed = res.data.map (c) -> parseComment c.body
+    github.prGetChanges config, repo, pr
+    .then (change) ->
+      found = false
+      for c in parsed
+        sameFrom = sameSHA c.fromCommit, change.base.sha
+        sameTo = sameSHA c.toCommit, change.head.sha
+        if sameFrom and sameTo
+          found = true
+
+      hasChange = (not found)
+      return Promise.resolve hasChange
+
 main = () ->
   [_node, _script, repo, pr] = process.argv
 
@@ -46,9 +80,17 @@ main = () ->
 
   diffOptions = {}
 
-  github.graphsFromPR config, repo, pr
+  hasNewChanges config, repo, pr
+  .then (changed) ->
+    debug 'changed?', changed, repo, pr
+    if changed
+      return github.graphsFromPR config, repo, pr
+    else
+      return Promise.resolve { graphs: null }
   .then (data) ->
-    if data.graphs
+    hasGraphs = data.graphs?.length > 0
+    debug 'has graphs?', hasGraphs, repo, pr
+    if hasGraphs
       generateDiffs data.graphs, diffOptions
       return formatComment data
     else

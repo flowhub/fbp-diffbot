@@ -14,7 +14,8 @@
     "fbp-diffbot-checkpr": "fbp-diffbot-checkpr"
   },
   "scripts": {
-    "test": "mocha --reporter spec --compilers .coffee:coffee-script/register spec/*.coffee"
+    "test": "mocha --reporter spec --compilers .coffee:coffee-script/register spec/*.coffee",
+    "start": "node server.js"
   },
   "author": "Jon Nordby <jononor@gmail.com>",
   "license": "MIT",
@@ -23,6 +24,7 @@
     "bluebird": "^3.4.1",
     "coffee-script": "^1.10.0",
     "debug": "^2.2.0",
+    "express": "^4.14.0",
     "fbp": "^1.5.0",
     "fbp-diff": "0.0.7"
   },

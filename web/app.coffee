@@ -21,15 +21,16 @@ checkPr = (req, res) ->
     return res.status(code).end()
 
 githubHook = (req, res) ->
-  if req.headers['x-github-event'] != 'pull_request'
-    debug '/hooks/github', 'ignoring event type', req.headers['x-github-event']
-    return res.status(422).end()
-
-  repoName = req.body.repository.full_name
-  pr = req.body.pull_request.number
+  eventType = req.headers['x-github-event']
+  repoName = req.body?.repository?.full_name
+  pr = req.body?.pull_request?.number
   options = {}
 
-  debug '/hooks/github', req.body.action, repoName, pr
+  debug '/hooks/github', eventType, req.body?.action, repoName, pr
+
+  if eventType != 'pull_request'
+    debug '/hooks/github', 'ignoring event type', eventType
+    return res.status(422).end()
 
   fbpDiffBot.diffbot.checkPr req.config, repoName, pr, options
   .then (commentUrl) ->

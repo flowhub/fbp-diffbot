@@ -162,5 +162,38 @@ graphsFromPR = (config, repo, number) ->
       data.graphs = graphs
       return data
 
-module.exports.graphsFromPR = graphsFromPR
+exports.graphsFromPR = graphsFromPR
 
+repoAddHook = (config, repo, data) ->
+  request =
+    headers: {}
+  request.headers.Authorization = "token #{config.token}" if config.token
+  url = "#{config.endpoint}/repos/#{repo}/hooks"
+  return axios.post url, data, request
+
+exports.repoAddHook = repoAddHook
+
+main = () ->
+  config =
+    port: process.env.PORT || 3000
+    endpoint: 'https://api.github.com'
+    token: process.env.GH_TOKEN
+    ownurl: 'https://fbp-diff.herokuapp.com'
+  d =
+    name: 'web'
+    active: true
+    config:
+      url: config.ownurl+'/hooks/github'
+      content_type: 'json'
+      'fbp-diffbot-hook-version': 1
+    events: ['pull_request']
+
+  repo = 'imgflo/imgflo-server'
+  repoAddHook config, repo, d
+  .then (r) ->
+    console.log 'added webhook', r.data
+  .catch (err) ->
+    console.error err
+    process.exit 2
+
+main() if not module.parent

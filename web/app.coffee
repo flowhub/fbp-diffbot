@@ -1,12 +1,16 @@
 fbpDiffBot = require '..'
 express = require 'express'
 bodyParser = require 'body-parser'
+debug = require('debug')('fbp-diffbot:app')
 
 checkPr = (req, res) ->
   repo = "#{req.params.owner}/#{req.params.repo}"
+  pr = req.params.pr
   options = req.query
 
-  fbpDiffBot.diffbot.checkPr req.config, repo, req.params.pr, options
+  debug '/checkpr', repo, pr
+
+  fbpDiffBot.diffbot.checkPr req.config, repo, pr, options
   .then (commentUrl) ->
     return res.status(200).end()
   .catch (err) ->

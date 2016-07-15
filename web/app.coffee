@@ -17,7 +17,7 @@ checkPr = (req, res) ->
     return res.status(200).end()
   .catch (err) ->
     console.error '/checkpr', err
-    console.error err.stack if stack
+    console.error err.stack if err.stack
     code = err.code or 500
     return res.status(code).end()
 
@@ -42,7 +42,7 @@ githubHook = (req, res) ->
     return res.status(200).end()
   .catch (err) ->
     console.error '/hooks/github', err
-    console.error err.stack if stack
+    console.error err.stack if err.stack
     code = err.code or 500
     return res.status(code).end()
 

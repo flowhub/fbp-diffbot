@@ -46,4 +46,5 @@ main = () ->
     console.log 'e', err
     throw err
 
+exports.main = main
 main() if not module.parent

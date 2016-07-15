@@ -10,6 +10,18 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 * `fbp-diffbot-checkpr` can check Github PR, calculate diffs and post it as a comment
 
+## Usage
+
+### Manually request PR checking
+
+Endpoint: `POST /checkpr/$owner/$repo/$prnumber`
+
+    curl -X POST http://fbp-diffbot.herokuapp.com/checkpr/$owner/$repo/$prnumber
+
+So for to check [imgflo/imgflo-server#12](https://github.com/imgflo/imgflo-server/pull/12)
+would use the URL `http://fbp-diffbot.herokuapp.com/checkpr/imgflo/imgflo-server/12`.
+    
+
 ## TODO
 
 ### v0.1 "minimally useful"

@@ -9,6 +9,7 @@ checkPr = (req, res) ->
   .then (commentUrl) ->
     return res.status(200).end()
   .catch (err) ->
+    console.error '/checkpr', err
     code = err.code or 500
     return res.status(code).end()
 

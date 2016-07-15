@@ -15,7 +15,6 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 ### v0.1 "minimally useful"
 
 * Register webhooks for automatic update from Github
-* Deploy it to production
 
 ### Later
 

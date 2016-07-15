@@ -1,7 +1,9 @@
 fbpDiffBot = require '..'
+
 express = require 'express'
 bodyParser = require 'body-parser'
 debug = require('debug')('fbp-diffbot:app')
+bluebird = require 'bluebird'
 
 checkPr = (req, res) ->
   repo = "#{req.params.owner}/#{req.params.repo}"
@@ -53,6 +55,16 @@ exports.start = (override, callback) ->
   config = fbpDiffBot.common.getConfig override
 
   app = getApp config
-  app.listen config.port, (err) ->
-    return callback err if err
-    return callback null, app, config.port
+  listenApp = bluebird.promisify app.listen
+
+  fbpDiffBot.webhooks.ensureRepositoryHooks config
+  .then (added) ->
+    for add in added
+      debug 'added webhooks', add.data.url
+    if not added.length
+      debug 'no webhook additions needed'
+    return listenApp config.port
+  .then (rr) ->
+    app.port = config.port
+    return app
+  .nodeify callback

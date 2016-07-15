@@ -40,6 +40,8 @@ ensureRepositoryHooks = (config) ->
     added = results.filter (r) -> r?
     return Promise.resolve added
 
+exports.ensureRepositoryHooks = ensureRepositoryHooks
+
 main = () ->
   config = common.getConfig {}
 

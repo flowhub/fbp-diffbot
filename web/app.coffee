@@ -21,6 +21,10 @@ checkPr = (req, res) ->
     return res.status(code).end()
 
 githubHook = (req, res) ->
+  if req.headers['x-github-event'] != 'pull_request'
+    debug '/hooks/github', 'ignoring event type', req.headers['x-github-event']
+    return res.status(422).end()
+
   repoName = req.body.repository.full_name
   pr = req.body.pull_request.number
   options = {}

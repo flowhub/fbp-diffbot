@@ -43,8 +43,9 @@ parseComment = (comment) ->
     toCommit: null
   re = /[fbp\-diff].*`(\w*)...(\w*)`/
   match = re.exec comment
-  ret.fromCommit = match[1]
-  ret.toCommit = match[2]
+  if match
+    ret.fromCommit = match[1]
+    ret.toCommit = match[2]
   return ret
 
 sameSHA = (a, b) ->

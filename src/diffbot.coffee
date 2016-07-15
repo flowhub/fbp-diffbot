@@ -25,7 +25,7 @@ formatComment = (pr) ->
   to = pr.head.sha.slice(0, 10)
   # We add the commit info into the comment, and use this to keep state
   # It is important that the syntax stays compatible, as this forms a stringly API
-  comment += "[fbp-diff](https://github.com/flowbased/fbp-diff) for commits `#{from}...#{to}`\n"
+  comment += "[fbp-diff](https://github.com/flowbased/fbp-diff) for commits `#{from}...#{to}`\n\n"
 
   for graph in pr.graphs
     comment += "`#{graph.filename}`:\n"

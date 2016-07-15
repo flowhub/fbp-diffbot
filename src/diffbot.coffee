@@ -88,10 +88,9 @@ exports.checkPr = checkPr = (config, repo, pr, options) ->
       return null
   .then (maybeComment) ->
     if maybeComment
-      console.log 'Posting:\n', maybeComment
       return github.issuePostComment config, repo, pr, maybeComment
     else
-      Promise.resolve null
+      return Promise.resolve null
 
 main = () ->
   [_node, _script, repo, pr] = process.argv

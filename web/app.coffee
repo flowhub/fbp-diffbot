@@ -37,7 +37,7 @@ exports.start = (override, callback) ->
     port: process.env.PORT || 3000
     endpoint: 'https://api.github.com'
     token: process.env.GH_TOKEN
-    ownurl: 'https://fbp-diff.herokuapp.com'
+    ownurl: 'https://fbp-diffbot.herokuapp.com'
 
   config = {}
   for k, v of defaults

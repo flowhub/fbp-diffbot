@@ -178,7 +178,7 @@ main = () ->
     port: process.env.PORT || 3000
     endpoint: 'https://api.github.com'
     token: process.env.GH_TOKEN
-    ownurl: 'https://fbp-diff.herokuapp.com'
+    ownurl: 'https://fbp-diffbot.herokuapp.com'
   d =
     name: 'web'
     active: true

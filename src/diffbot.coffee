@@ -1,4 +1,6 @@
 github = require './github'
+common = require './common'
+
 fbpDiff = require 'fbp-diff'
 debug = require('debug')('fbp-diffbot:diffbot')
 
@@ -94,10 +96,7 @@ exports.checkPr = checkPr = (config, repo, pr, options) ->
 
 main = () ->
   [_node, _script, repo, pr] = process.argv
-
-  config =
-    endpoint: 'https://api.github.com'
-    token: process.env.GH_TOKEN
+  config = common.getConfig()
 
   throw new Error 'Missing Github PR repo PR' if not (repo and pr)
   if not config.token

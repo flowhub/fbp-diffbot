@@ -1,3 +1,4 @@
+common = require './common'
 
 axios = require 'axios'
 bluebird = require 'bluebird'
@@ -174,11 +175,7 @@ repoAddHook = (config, repo, data) ->
 exports.repoAddHook = repoAddHook
 
 main = () ->
-  config =
-    port: process.env.PORT || 3000
-    endpoint: 'https://api.github.com'
-    token: process.env.GH_TOKEN
-    ownurl: 'https://fbp-diffbot.herokuapp.com'
+  config = common.getConfig()
   d =
     name: 'web'
     active: true

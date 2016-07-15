@@ -25,14 +25,4 @@ would use the URL `http://fbp-diffbot.herokuapp.com/checkpr/imgflo/imgflo-server
 
 ## TODO
 
-### v0.1 "minimally useful"
-
-* Register webhooks for automatic update from Github
-* Write some tests
-
-### Later
-
-* Perform check/diffing in dedicated worker, using MsgFlo+guv
-* Find out how to invalidate/remove outdated comments. Comment onto the diff instead of PR?
-* Support visual diffs
-* UI for enabling it for a given repo/organization
+See [Github Issues](https://github.com/jonnor/fbp-diffbot/issues)

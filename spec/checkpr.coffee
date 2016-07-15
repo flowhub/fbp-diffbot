@@ -20,7 +20,12 @@ describe 'Checking Github PR', ->
   describe 'with a removed graph', ->
     it 'should post a new diff'
 
-  describe 'with error in graph', ->
+  describe 'with non-graph .json', ->
+    it 'should still post diffs for the graph .json files'
+    it 'should post the error'
+
+  describe 'with error in a graph', ->
+    it 'should still post diffs for the rest'
     it 'should post the error'
 
   describe 'with unexpected error', ->

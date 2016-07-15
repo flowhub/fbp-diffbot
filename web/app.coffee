@@ -60,7 +60,7 @@ exports.start = (override, callback) ->
   config = fbpDiffBot.common.getConfig override
 
   app = getApp config
-  listenApp = bluebird.promisify app.listen
+  listenApp = bluebird.promisify (port, callback) -> app.listen port, callback
 
   fbpDiffBot.webhooks.ensureRepositoryHooks config
   .then (added) ->

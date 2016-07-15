@@ -14,12 +14,14 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 ### v0.1 "minimally useful"
 
+* Avoid duplicate comments
+* Add HTTP API for manually triggering PR check
 * Register webhooks for automatic update from Github
-* Find out how to invalidate outdated comments. Post onto the diff?
-* Find out how to avoid duplicate comments
 * Deploy it to production
 
 ### Later
 
+* Perform check/diffing in dedicated worker, using MsgFlo+guv
+* Find out how to invalidate/remove outdated comments. Comment onto the diff instead of PR?
 * Support visual diffs
 * UI for enabling it for a given repo/organization

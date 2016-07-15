@@ -68,17 +68,8 @@ hasNewChanges = (config, repo, pr) ->
       hasChange = (not found)
       return Promise.resolve hasChange
 
-main = () ->
-  [_node, _script, repo, pr] = process.argv
-
-  config =
-    endpoint: 'https://api.github.com'
-    token: process.env.GH_TOKEN
-
-  throw new Error 'Missing Github PR repo PR' if not (repo and pr)
-  #throw new Error 'Missing Github OAuth token (GH_TOKEN envvar)' if not config.token
-
-  diffOptions = {}
+exports.checkPr = checkPr = (config, repo, pr, options) ->
+  options.diff = {} if not options
 
   hasNewChanges config, repo, pr
   .then (changed) ->
@@ -91,7 +82,7 @@ main = () ->
     hasGraphs = data.graphs?.length > 0
     debug 'has graphs?', hasGraphs, repo, pr
     if hasGraphs
-      generateDiffs data.graphs, diffOptions
+      generateDiffs data.graphs, options.diff
       return formatComment data
     else
       return null
@@ -99,6 +90,26 @@ main = () ->
     if maybeComment
       console.log 'Posting:\n', maybeComment
       return github.issuePostComment config, repo, pr, maybeComment
+    else
+      Promise.resolve null
+
+main = () ->
+  [_node, _script, repo, pr] = process.argv
+
+  config =
+    endpoint: 'https://api.github.com'
+    token: process.env.GH_TOKEN
+
+  throw new Error 'Missing Github PR repo PR' if not (repo and pr)
+  if not config.token
+    console.error 'WARNING: Missing Github OAuth token (GH_TOKEN envvar). Can only access public PRs'
+
+  options = {}
+
+  checkPr config, repo, pr, options
+  .then (commentUrl) ->
+    if commentUrl
+      console.log 'Posted comment', commentUrl
     else
       console.log "No changes"
   .catch (err) ->

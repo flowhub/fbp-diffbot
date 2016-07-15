@@ -1,5 +1,6 @@
 fbpDiffBot = require '..'
 express = require 'express'
+bodyParser = require 'body-parser'
 
 checkPr = (req, res) ->
   repo = "#{req.params.owner}/#{req.params.repo}"
@@ -13,6 +14,10 @@ checkPr = (req, res) ->
     code = err.code or 500
     return res.status(code).end()
 
+githubHook = (req, res) ->
+  console.log '/hooks/github', req.body
+  return res.status(404).end() # FIXME: implement
+
 exports.getApp = getApp = (config) ->
   app = express()
 
@@ -20,7 +25,10 @@ exports.getApp = getApp = (config) ->
     req.config = config # Attach config to request, so handlers can access
     next()
 
+  app.use(bodyParser.json())
+
   app.post '/checkpr/:owner/:repo/:pr', checkPr
+  app.post '/hooks/github', githubHook
 
   return app
 
@@ -29,6 +37,7 @@ exports.start = (override, callback) ->
     port: process.env.PORT || 3000
     endpoint: 'https://api.github.com'
     token: process.env.GH_TOKEN
+    ownurl: 'https://fbp-diff.herokuapp.com'
 
   config = {}
   for k, v of defaults

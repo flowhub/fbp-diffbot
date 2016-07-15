@@ -28,8 +28,12 @@ githubHook = (req, res) ->
 
   debug '/hooks/github', eventType, req.body?.action, repoName, pr
 
+  if eventType == 'ping'
+    # return success, mostly useful to avoid the Github ping showing as a fail
+    return res.status(200).end()
+
   if eventType != 'pull_request'
-    debug '/hooks/github', 'ignoring event type', eventType
+    debug '/hooks/github', 'unknown event', eventType
     return res.status(422).end()
 
   fbpDiffBot.diffbot.checkPr req.config, repoName, pr, options

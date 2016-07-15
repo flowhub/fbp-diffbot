@@ -19,7 +19,20 @@ checkPr = (req, res) ->
     return res.status(code).end()
 
 githubHook = (req, res) ->
-  console.log '/hooks/github', req.body
+  repoName = req.body.repository.full_name
+  pr = req.body.pull_request.number
+  options = {}
+
+  debug '/hooks/github', req.body.action, repoName, pr
+
+  fbpDiffBot.diffbot.checkPr req.config, repoName, pr, options
+  .then (commentUrl) ->
+    return res.status(200).end()
+  .catch (err) ->
+    console.error '/hooks/github', err
+    code = err.code or 500
+    return res.status(code).end()
+
   return res.status(404).end() # FIXME: implement
 
 exports.getApp = getApp = (config) ->

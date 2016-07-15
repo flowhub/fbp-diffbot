@@ -69,7 +69,7 @@ hasNewChanges = (config, repo, pr) ->
       return Promise.resolve hasChange
 
 exports.checkPr = checkPr = (config, repo, pr, options) ->
-  options.diff = {} if not options
+  options.diff = {} if not options.diff?
 
   hasNewChanges config, repo, pr
   .then (changed) ->

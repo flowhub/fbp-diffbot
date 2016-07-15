@@ -9,6 +9,7 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 **Proof of concept**
 
 * `fbp-diffbot-checkpr` can check Github PR, calculate diffs and post it as a comment
+* Service live at http://fbp-diffbot.herokuapp.com
 
 ## Usage
 
@@ -27,6 +28,7 @@ would use the URL `http://fbp-diffbot.herokuapp.com/checkpr/imgflo/imgflo-server
 ### v0.1 "minimally useful"
 
 * Register webhooks for automatic update from Github
+* Write some tests
 
 ### Later
 

@@ -1,17 +1,34 @@
 github = require './github'
 fbpDiff = require 'fbp-diff'
 
+# TODO: move added/removed handling into fbp-diff itself?
+nullGraph =
+  processes: {}
+  connections: []
+
 generateDiffs = (graphs, options) ->
   for g in graphs
     type = g.filename.split('.').pop()
     options.format = type
-    g.diff = fbpDiff.diff g.from, g.to, options
+    from = g.from
+    to = g.to
+    if type == 'json'
+      from = JSON.stringify nullGraph if g.from.length == 0
+      to = JSON.stringify nullGraph if g.to.length == 0
+    g.diff = fbpDiff.diff from, to, options
 
-formatComment = (graphs) ->
+# Format Markdown to post as comment
+formatComment = (pr) ->
   comment = ""
 
-  for graph in graphs
-    comment += "[fbp-diff](https://github.com/flowbased/fbp-diff) for `#{graph.filename}`:\n"
+  from = pr.base.sha.slice(0, 10)
+  to = pr.head.sha.slice(0, 10)
+  # We add the commit info into the comment, and use this to keep state
+  # It is important that the syntax stays compatible, as this forms a stringly API
+  comment += "[fbp-diff](https://github.com/flowbased/fbp-diff) for commits `#{from}...#{to}`\n"
+
+  for graph in pr.graphs
+    comment += "`#{graph.filename}`:\n"
     comment += "```\n#{graph.diff}\n```\n"
     comment += "\n"
 
@@ -30,10 +47,10 @@ main = () ->
   diffOptions = {}
 
   github.graphsFromPR config, repo, pr
-  .then (graphs) ->
-    generateDiffs graphs, diffOptions
-    if graphs
-      return formatComment graphs
+  .then (data) ->
+    if data.graphs
+      generateDiffs data.graphs, diffOptions
+      return formatComment data
     else
       return null
   .then (maybeComment) ->

@@ -1,6 +1,17 @@
 
 axios = require 'axios'
 bluebird = require 'bluebird'
+debug = require('debug')('fbp-diffbot:github')
+
+class HttpError extends Error
+  constructor: (msg, code) ->
+    @code = code or 500
+    @message = msg
+    super msg
+
+HttpError.hasErrorCode = (code) ->
+  return (err) ->
+    return err.code == code
 
 getFile = (config, repo, path) ->
   request =
@@ -51,6 +62,7 @@ fileAtRevision = (config, repo, revision, filepath) ->
     headers: {}
   request.headers.Authorization = "token #{config.token}" if config.token
 
+  debug 'fetching file', repo, revision, filepath
   axios.get "#{config.endpoint}/repos/#{repo}/git/commits/#{revision}", request
   .then (req) ->
     commit = req.data
@@ -67,7 +79,7 @@ fileAtRevision = (config, repo, revision, filepath) ->
     for file in tree
       if file.path == filepath
         foundUrl = file.url
-    throw new Error "File #{filepath} does not exist in #{revision} of #{repo}" if not foundUrl
+    throw new HttpError "File #{filepath} does not exist in #{revision} of #{repo}", 404 if not foundUrl
     return foundUrl
   .then (u) ->
     axios.get u, request
@@ -108,11 +120,17 @@ graphsFromPR = (config, repo, number) ->
     bluebird.map data.graphsChanged, (graph) ->
       ret =
         filename: graph.filename
-      fileAtRevision config, data.head.repo, data.head.sha, graph.filename
+      bluebird.resolve(fileAtRevision config, data.head.repo, data.head.sha, graph.filename)
+      .catch HttpError.hasErrorCode(404), (err) ->
+        debug 'to graph not found', graph.filename, data.head.sha
+        ret.to = ""
       .then (contents) ->
         ret.to = contents
       .then (_) ->
-        fileAtRevision config, repo, data.base.sha, graph.filename
+        bluebird.resolve(fileAtRevision config, repo, data.base.sha, graph.filename)
+        .catch HttpError.hasErrorCode(404), (err) ->
+          debug 'from graph not found', graph.filename, data.base.sha
+          ret.from = ""
         .then (contents) ->
           ret.from = contents
           return ret
@@ -125,7 +143,7 @@ graphsFromPR = (config, repo, number) ->
 
     .then (graphs) ->
       data.graphs = graphs
-      return data.graphs
+      return data
 
 module.exports.graphsFromPR = graphsFromPR
 

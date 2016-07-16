@@ -17,6 +17,10 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 See [Github Issues](https://github.com/jonnor/fbp-diffbot/issues)
 
+## Changelog
+
+See [CHANGES.md](./CHANGES.md)
+
 ## Using the service
 
 ### Adding public repos

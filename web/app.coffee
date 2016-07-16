@@ -69,14 +69,15 @@ exports.start = (override, callback) ->
   listenApp = bluebird.promisify (port, callback) -> app.listen port, callback
 
   fbpDiffBot.webhooks.ensureRepositoryHooks config
+  .catch (err) ->
+    console.error 'unable to register webhooks', err
+    return Promise.resolve []
   .then (added) ->
     for add in added
       debug 'added webhooks', add.data.url
     if not added.length
       debug 'no webhook additions needed'
     return listenApp config.port
-  .catch (err) ->
-    console.error 'unable to register webhooks', err
   .then (rr) ->
     app.port = config.port
     return app

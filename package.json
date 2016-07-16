@@ -1,6 +1,6 @@
 {
   "name": "fbp-diffbot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bot producing fbp-diff for Github PRs",
   "main": "index.js",
   "keywords": [

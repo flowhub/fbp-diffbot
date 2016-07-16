@@ -38,6 +38,8 @@ See [CHANGES.md](./CHANGES.md)
 It will then be added to the `FBPDIFFBOT_EXTRA_REPOSITORIES` envvar of the deployed service,
 so the repository name does not need to be visible in public.
 
+Note that approval is manual, so it *may take a day or two*.
+
 ### Manually request PR checking
 
 Endpoint: `POST /checkpr/$owner/$repo/$prnumber`

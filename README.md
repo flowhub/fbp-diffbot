@@ -6,12 +6,26 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 ## Status
 
-**Proof of concept**
+**Minimally useful**
 
-* `fbp-diffbot-checkpr` can check Github PR, calculate diffs and post it as a comment
-* Service live at http://fbp-diffbot.herokuapp.com
+* Service is live at http://fbp-diffbot.herokuapp.com
+* Can follow PR changes in public repos and post diffs as comments
+* Simple HTTP API allows to request checking without
+* Command-line tool `fbp-diffbot-checkpr` allows checking without using the service
 
-## Usage
+## TODO
+
+See [Github Issues](https://github.com/jonnor/fbp-diffbot/issues)
+
+## Using the service
+
+### Adding public repos
+
+[Edit config.yaml](https://github.com/jonnor/fbp-diffbot/edit/master/config.yaml) and submit a pull request.
+
+### Adding private repos
+
+[TODO: improve support](https://github.com/jonnor/fbp-diffbot/issues/4)
 
 ### Manually request PR checking
 
@@ -21,8 +35,4 @@ Endpoint: `POST /checkpr/$owner/$repo/$prnumber`
 
 So for to check [imgflo/imgflo-server#12](https://github.com/imgflo/imgflo-server/pull/12)
 would use the URL `http://fbp-diffbot.herokuapp.com/checkpr/imgflo/imgflo-server/12`.
-    
 
-## TODO
-
-See [Github Issues](https://github.com/jonnor/fbp-diffbot/issues)

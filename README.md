@@ -10,7 +10,8 @@ This is useful when doing code reviews, as it makes it easier to understand the 
 
 * Service is live at http://fbp-diffbot.herokuapp.com
 * Can follow PR changes in public repos and post diffs as comments
-* Simple HTTP API allows to request checking without
+* *Experimental* support for private repos
+* Simple HTTP API allows to request checking without requiring webhook integration
 * Command-line tool `fbp-diffbot-checkpr` allows checking without using the service
 
 ## TODO
@@ -29,7 +30,13 @@ See [CHANGES.md](./CHANGES.md)
 
 ### Adding private repos
 
-[TODO: improve support](https://github.com/jonnor/fbp-diffbot/issues/4)
+**WARNING: Experimental** [TODO: improve support](https://github.com/jonnor/fbp-diffbot/issues/4)
+
+* 1) Add the `fbp-diffbot` user as a collaborator on the repo, with *READ* access
+* 2a) Put your repo into `config.yaml` like with public repo
+* 2b) Alternative, send an email to `jononor+fbp-diffbot@gmail.com` with the name of the repository.
+It will then be added to the `FBPDIFFBOT_EXTRA_REPOSITORIES` envvar of the deployed service,
+so the repository name does not need to be visible in public.
 
 ### Manually request PR checking
 

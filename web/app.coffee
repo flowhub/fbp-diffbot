@@ -75,6 +75,8 @@ exports.start = (override, callback) ->
     if not added.length
       debug 'no webhook additions needed'
     return listenApp config.port
+  .catch (err) ->
+    console.error 'unable to register webhooks', err
   .then (rr) ->
     app.port = config.port
     return app

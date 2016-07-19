@@ -4,21 +4,11 @@ common = require './common'
 fbpDiff = require 'fbp-diff'
 debug = require('debug')('fbp-diffbot:diffbot')
 
-# TODO: move added/removed handling into fbp-diff itself?
-nullGraph =
-  processes: {}
-  connections: []
-
 generateDiffs = (graphs, options) ->
   for g in graphs
     type = g.filename.split('.').pop()
     options.format = type
-    from = g.from
-    to = g.to
-    if type == 'json'
-      from = JSON.stringify nullGraph if g.from.length == 0
-      to = JSON.stringify nullGraph if g.to.length == 0
-    g.diff = fbpDiff.diff from, to, options
+    g.diff = fbpDiff.diff g.from, g.to, options
 
 # Format Markdown to post as comment
 formatComment = (pr) ->

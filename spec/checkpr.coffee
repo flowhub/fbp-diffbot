@@ -14,6 +14,9 @@ describe 'Checking Github PR', ->
   describe 'with new changes in graphs', ->
     it 'should post a new diff'
 
+  describe 'with new commits without changes in graphs', ->
+    it 'should not post a new diff'
+
   describe 'with an added graph', ->
     it 'should post a new diff'
 

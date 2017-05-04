@@ -1,5 +1,7 @@
 # fbp-diffbot
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/flowhub/fbp-diffbot.svg)](https://greenkeeper.io/)
+
 Automatically posts diffs for FBP graph changes on Github [Pull Requests](https://help.github.com/articles/using-pull-requests/),
 using [fbp-diff](https://github.com/flowbased/fbp-diff).
 This is useful when doing code reviews, as it makes it easier to understand the changes that were made.

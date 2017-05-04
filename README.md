@@ -1,6 +1,4 @@
-# fbp-diffbot
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/flowhub/fbp-diffbot.svg)](https://greenkeeper.io/)
+# fbp-diffbot [![Build Status](https://travis-ci.org/flowhub/fbp-diffbot.svg?branch=master)](https://travis-ci.org/flowhub/fbp-diffbot) [![Greenkeeper badge](https://badges.greenkeeper.io/flowhub/fbp-diffbot.svg)](https://greenkeeper.io/)
 
 Automatically posts diffs for FBP graph changes on Github [Pull Requests](https://help.github.com/articles/using-pull-requests/),
 using [fbp-diff](https://github.com/flowbased/fbp-diff).
